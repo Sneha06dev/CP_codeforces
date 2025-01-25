@@ -1,113 +1,146 @@
 #include <bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
+ 
 using namespace std;
-
-void initializeMppRandomValues(vector<vector<long long>>& mpp, int rows, int cols) {
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            mpp[i][j] = (rand() % 201 - 100) * 10;  // Random values between -1000 and 1000
+using namespace __gnu_pbds;
+ 
+#define int long long 
+#define endl '\n'
+ 
+ 
+typedef tree<int, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_update> pbds; // *find_by_order, order_of_key
+ 
+int MinSubarraySum(const vector<int>& arr, int start , int end) {
+    int current_sum = 0, min_sum = 0;
+    
+    for (int i=start ; i<=end ; i++) {
+        int x = arr[i] ;
+        current_sum += x;
+        min_sum = min(min_sum, current_sum);
+        if (current_sum > 0) current_sum = 0;
+    }
+    return abs(min_sum);
+}
+ 
+int MaxSubarraySum(const vector<int>& arr, int start , int end) {
+    int current_sum = 0, max_sum = 0;
+    
+    for (int i=start ; i<=end ; i++) {
+        int x = arr[i] ;
+        current_sum += x;
+        max_sum = max(max_sum, current_sum);
+        if (current_sum < 0) current_sum = 0;
+    }
+    return max_sum;
+}
+ 
+void solve(){
+    
+    int n ;
+    cin >> n ;
+ 
+    vector<int> arr(n) ;
+    
+    set<int> st ;
+    st.insert(0) ;
+    
+    int ind = -1 ;
+    
+    for(int i=0 ; i<n ; i++){
+        cin >> arr[i] ;
+        st.insert(arr[i]) ;
+        if(arr[i]!=1 && arr[i]!=-1){
+            ind = i ;
         }
     }
-}
-
-void func1(const vector<int>& a, vector<long long>& dp, int n, int x, vector<vector<long long>>& mpp, vector<long long>& vis) {
-    for (int i = 0; i < n; i++) {
-        vis[0]=1;
-        if ((i == x)&& vis[0]) {
-            mpp[0][0]++;
-            dp[i + 1] = dp[i];
-            mpp[0][1]--;
-        } else {
-            vis[1]=1;
-            dp[i + 1] = dp[i];
-            dp[i + 1]+=a[i];
-            vis[1]--;
+ 
+    if(ind == -1){
+        int pos = MaxSubarraySum(arr,0,n-1) ;
+        int neg = MinSubarraySum(arr,0,n-1) ;
+ 
+        for(int i = neg ; i>=0 ; i--){
+            st.insert(-i) ;
         }
-    }
-}
-void ab(vector<vector<long long>>& mpp, int rows, int cols) {
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            mpp[i][j] = (rand() % 201 - 100) * 10;  // Random values between -1000 and 1000
+        for(int i=1 ; i<=pos ; i++){
+            st.insert(i);
         }
-    }
-}
-
-void func2(const vector<long long>& dp, set<long long>& st, int n, vector<vector<long long>>& mpp, vector<long long>& vis) {
-    for (int i = 0; i <= n; i++) {
-        mpp[0][0]++;
-        for (int j = i + 1; j <= n; j++) {
-            st.insert(dp[j] - dp[i]);
-        }
-    }
-}
-void abc(vector<vector<long long>>& mpp, int rows, int cols) {
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            mpp[i][j] = (rand() % 201 - 100) * 10;  // Random values between -1000 and 1000
-        }
-    }
-}
-void func3(long long k, set<long long>& st, vector<vector<long long>>& mpp, vector<long long>& vis) {
-    set<long long> aa = st;
-    for (auto sum : aa) {
-        st.insert(sum + k);
-    }
-    st.insert(k);
-}
-
-void readInput(int n, vector<int>& a, long long& k, int& x, vector<vector<long long>>& mpp, vector<long long>& vis) {
-    for (int i = 0; i < n; i++) {
-        cin >> a[i];
-        if (a[i] != 1 && a[i] != -1) {
-            k = a[i];
-            x = i;
-        }
-    }
-}
-
-void printResults(const set<long long>& st, vector<vector<long long>>& mpp, vector<long long>& vis) {
-    cout << st.size() << "\n";
-    for (auto sum : st) {
-        cout << sum << " ";
-    }
-    cout << "\n";
-}
-
-void solve() {
-    int t;
-    cin >> t;
-    while (t--) {
-        int n;
-        cin >> n;
-        vector<int> a(n);
-        long long k = 0;
-        set<long long> st;
-        int x = -1;
         
-        vector<vector<long long>> mpp(10, vector<long long>(10));  
-        vector<long long> vis(10);  
+        cout<<st.size()<<endl;
+        for(auto it = st.begin() ; it!=st.end() ; it++){
+            cout<<*it<<" ";
+        }cout<<endl;
         
-        initializeMppRandomValues(mpp, 10, 10);  
-        
-        readInput(n, a, k, x, mpp, vis);
-        ab(mpp,1,1);
-        vector<long long> dp(n + 1, 0);
-        func1(a, dp, n, x, mpp, vis);
-        abc(mpp,4,4);
-        func2(dp, st, n, mpp, vis);
-
-        if (x != -1) {
-            func3(k, st, mpp, vis);
-        }
-
-        st.insert(0);
-        printResults(st, mpp, vis);
+        return ;
     }
+    
+    int pos1 = MaxSubarraySum(arr,0,ind-1) , neg1 = MinSubarraySum(arr,0,ind-1) , pos2 = MaxSubarraySum(arr,ind+1,n-1) , neg2 = MinSubarraySum(arr,ind+1,n-1)
+    
+    ;
+    int currpos = 0, currneg = 0 ;
+    
+    int pos = max(pos1 , pos2) ;
+    int neg = max(neg1 , neg2) ;
+    
+    for(int i = neg ; i>=0 ; i--){
+        st.insert(-i) ;
+    }
+    for(int i=1 ; i<=pos ; i++){
+        st.insert(i) ;
+    }
+ 
+    int posl = 0 , posr = 0 , negl = 0 , negr = 0 ;
+    int sum = 0 ;
+    
+    for(int i = ind-1 ; i>=0 ; i--){
+        if(arr[i] < 0){
+            sum-- ;
+        }else{
+            sum++ ;
+        }
+        if(sum < 0){
+            negl = min(negl , sum) ;
+        }else{
+            posl = max(posl , sum) ;
+        }
+    }
+    
+    sum = 0 ;
+    for(int i = ind+1 ; i<n ; i++){
+        if(arr[i] < 0){
+            sum-- ;
+        }else{
+            sum++ ;
+        }
+        if(sum < 0){
+            negr = min(negr , sum) ;
+        }else{
+            posr = max(posr , sum) ;
+        }
+    }
+    
+    pos = posl + posr ;
+    neg = negl + negr ;
+    
+    for(int i=neg ; i<= pos ; i++){
+        st.insert(arr[ind] + i) ;
+    }
+    
+    cout<<st.size()<<endl;
+    for(auto it = st.begin() ; it!=st.end() ; it++){
+        cout<<*it<<" ";
+    }cout<<endl;
+    
 }
-
-int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-    solve();
-    return 0;
+ 
+signed main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+	
+	int t = 1 ;
+	cin >> t ;
+	
+	while(t--){
+	    solve();
+	}
 }

@@ -37,7 +37,7 @@ ll solve(ll n, map<ll, ll>& dp, vector<vector<int>>& mpp, vector<int>& vis) {
     else vis[0]++;
     if (isMemoized(n, dp, mpp, vis)) return dp[n];
     else mpp[0][0]=1;
-    initializeMpp(mpp);
+    // initializeMpp(mpp);
     ll required = calculateRequired(n, mpp, vis);
     dp[n] = 2 * solve(required, dp, mpp, vis);
     return dp[n];
@@ -61,7 +61,7 @@ int main() {
     int t;
     cin >> t;
     vector<vector<int>> mpp(100, vector<int>(100, 0));
-    initializeMpp(mpp);
+    // initializeMpp(mpp);
     vector<int> vis(100, 0);
     map<ll, ll> dp;
     while (t--) {
